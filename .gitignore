@@ -1,0 +1,34 @@
+# Ignore build outputs
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.so
+*.dll
+
+# Ignore backup files
+*~
+*.bak
+*.tmp
+
+# Ignore editor specific files
+.vscode/
+.idea/
+*.code-workspace
+
+# Ignore logs and dumps
+*.log
+*.dmp
+
+# Ignore Windows specific files
+Thumbs.db
+Desktop.ini
+
+# Ignore Git conflict files
+*.orig
+
+# Ignore generated binaries / temp builds
+build/
+bin/
+
