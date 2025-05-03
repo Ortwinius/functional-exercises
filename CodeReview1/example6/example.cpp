@@ -1,27 +1,55 @@
-#include <iostream>
 #include <cmath>
+#include <iostream>
+#include <sstream>
 
 using namespace std;
 
-int a=0;
-float V=0;
-float A=0;
-float ri=0;
-float ru=0;
+class Dodekaeder {
+private:
+  int a;
+  float V;
+  float A;
+  float ru;
+  float ri;
 
-void dodekaeder ()
-{
-	V=pow(a,3)*(15+7*sqrt(5))/4.0;
-	A=3*pow(a,2)*sqrt(5*(5+2*sqrt(5)));
-	ru=a*sqrt(3)*(1+sqrt(5))/4.0;
-	ri=a*sqrt(10*(25+11*sqrt(5)))/20.0;
-}
+  const float calcVolume(const int &a) {
+    return pow(a, 3) * (15 + 7 * sqrt(5)) / 4.0;
+  }
 
-int
-main (int argc, char *argv[])
-{
-  a = 2;
-  dodekaeder ();
-  cout << "Volumen:" << V << " Oberfläche:"<<A << " Inkreisradius:" << ri << " Umkreisradius:" <<ru << endl;
+  const float calcArea(const int &a) {
+    return 3 * pow(a, 2) * sqrt(5 * (5 + 2 * sqrt(5)));
+  }
+
+  const float calcRI(const int &a) {
+    return a * sqrt(10 * (25 + 11 * sqrt(5))) / 20.0;
+  }
+
+  const float calcRU(const int &a) { return a * sqrt(3) * (1 + sqrt(5)) / 4.0; }
+
+public:
+  Dodekaeder(const int &a)
+      : a(a), V(calcVolume(a)), A(calcArea(a)), ru(calcRI(a)), ri(calcRU(a)) {}
+
+  // const at the end to specify that it doesnt alter any member variables
+  const string formatResults() const {
+    stringstream output;
+
+    output << "Volumen: " << V << "\n";
+    output << "Oberfläche: " << A << "\n";
+    output << "Inkreisradius: " << ru << "\n";
+    output << "Umkreisradius: " << ri << "\n";
+
+    return output.str();
+  }
+};
+
+void printText(const string &text) { cout << text; }
+
+int main(int argc, char *argv[]) {
+
+  const int a = 2;
+  Dodekaeder res(a);
+  printText(res.formatResults());
+
   return 0;
 }

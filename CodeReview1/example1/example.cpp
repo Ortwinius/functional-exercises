@@ -23,7 +23,7 @@ const CubeProps quader(const int a, const int b, const int c) {
   return cube;
 }
 
-const string formatResultsPure(const CubeProps &cube) {
+const string formatResults(const CubeProps &cube) {
   stringstream output;
   output << "Volumen: " << cube.volume << "\n";
   output << "Oberfläche: " << cube.area << "\n";
@@ -31,14 +31,14 @@ const string formatResultsPure(const CubeProps &cube) {
   return output.str();
 }
 
-void printPure(const string &text) { cout << text; }
+void printText(const string &text) { cout << text; }
 
 int main(int argc, char *argv[]) {
   int a = 2, b = 3, c = 4;
 
   CubeProps newCube = quader(a, b, c);
 
-  printPure(formatResultsPure(newCube));
+  printText(formatResults(newCube));
 
   return 0;
 }
