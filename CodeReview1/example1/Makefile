@@ -1,4 +1,4 @@
-PROGRAM   = example.exe
+PROGRAM   = example
 CXX       = clang++
 CXXFLAGS  = -g -std=c++20 -Wall -lm
 
