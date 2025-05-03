@@ -1,27 +1,52 @@
-#include <iostream>
 #include <cmath>
+#include <iostream>
+#include <sstream>
 
 using namespace std;
 
-int a=0;
-float V=0;
-float A=0;
-float ri=0;
-float ru=0;
+// TODO rename ikosaeder
+class Result {
+private:
+  int a = 0;
+  float V = 0;
+  float A = 0;
+  float ru = 0;
+  float ri = 0;
 
-void ikosaeder ()
-{
-	V=5*pow(a,3)*(3+sqrt(5))/12;
-	A=5*pow(a,2)*sqrt(3);
-	ru=a/4.0*sqrt(2*(5+sqrt(5)));
-	ri=a*sqrt(3)*(3+sqrt(5))/12;
-}
+  const float calcVolume(const int &a) {
+    return 5 * pow(a, 3) * (3 + sqrt(5)) / 12;
+  }
 
-int
-main (int argc, char *argv[])
-{
-  a = 2;
-  ikosaeder ();
-  cout << "Volumen:" << V << " Oberfläche:"<<A << " Inkreisradius:" << ri << " Umkreisradius:" <<ru << endl;
+  const float calcArea(const int &a) { return 5 * pow(a, 2) * sqrt(3); }
+
+  const float calcRU(const int &a) { return a / 4.0 * sqrt(2 * (5 + sqrt(5))); }
+
+  const float calcRI(const int &a) { return a * sqrt(3) * (3 + sqrt(5)) / 12; }
+
+public:
+  Result(const int &a)
+      : a(a), V(calcVolume(a)), A(calcArea(a)), ri(calcRI(a)), ru(calcRU(a)) {}
+
+  // const at the end to specify that it doesnt alter any member variables
+  const string formatResults() const {
+    stringstream output;
+
+    output << "Volumen: " << V << "\n";
+    output << "Oberfläche: " << A << "\n";
+    output << "Inkreisradius: " << ri << "\n";
+    output << "Umkreisradius: " << ru << "\n";
+
+    return output.str();
+  }
+};
+
+void printText(const string &text) { cout << text; }
+
+int main(int argc, char *argv[]) {
+
+  const int a = 2;
+  Result res(a);
+  printText(res.formatResults());
+
   return 0;
 }
