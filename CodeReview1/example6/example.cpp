@@ -4,8 +4,7 @@
 
 using namespace std;
 
-// TODO: rename Dodekaeder
-class Result {
+class Dodekaeder {
 private:
   int a;
   float V;
@@ -28,7 +27,7 @@ private:
   const float calcRU(const int &a) { return a * sqrt(3) * (1 + sqrt(5)) / 4.0; }
 
 public:
-  Result(const int &a)
+  Dodekaeder(const int &a)
       : a(a), V(calcVolume(a)), A(calcArea(a)), ri(calcRI(a)), ru(calcRU(a)) {}
 
   // const at the end to specify that it doesnt alter any member variables
@@ -49,7 +48,7 @@ void printText(const string &text) { cout << text; }
 int main(int argc, char *argv[]) {
 
   const int a = 2;
-  Result res(a);
+  Dodekaeder res(a);
   printText(res.formatResults());
 
   return 0;
