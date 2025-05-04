@@ -4,13 +4,7 @@
 
 using namespace std;
 
-int a = 0;
-float V = 0;
-float A = 0;
-float ri = 0;
-float ru = 0;
-
-// TODO rename to oktaeder
+// TODO: rename to oktaeder
 class Result {
 private:
   int a = 0;
