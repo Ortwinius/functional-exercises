@@ -1,3 +1,9 @@
+# Mac OS files
+.DS_Store
+
+# Ignore all executable files without ending, like ./example
+/[a-zA-Z0-9_-]*
+
 # Ignore build outputs
 *.o
 *.obj
