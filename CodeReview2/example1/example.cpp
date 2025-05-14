@@ -7,7 +7,7 @@ using namespace std;
 
 // Quader
 
-// 1) Volumen: a, b, c → V = a * b * c
+// 1) Volumen: a, b, c => V = a * b * c
 auto calcVolume = [](const int &a) {
     return [=](const int &b) {
         return [=](const int &c) {
@@ -16,7 +16,7 @@ auto calcVolume = [](const int &a) {
     };
 };
 
-// 2) Oberfläche: a, b, c → A = 2 * (a*b + a*c + b*c)
+// 2) Oberfläche: a, b, c => A = 2 * (a*b + a*c + b*c)©
 auto calcArea = [](const int &a) {
     return [=](const int &b) {
         return [=](const int &c) {
@@ -25,20 +25,20 @@ auto calcArea = [](const int &a) {
     };
 };
 
-// 3) Raumdiagonale: a, b, c → d = sqrt(a² + b² + c²)
+// 3) Raumdiagonale: a, b, c => d = sqrt(a^2 + b^2 + c^2)
 auto calcDiagonal = [](const int &a) {
     return [=](const int &b) {
         return [=](const int &c) {
             return sqrt(
                 pow(a, 2) +
-                pow(b, 2) +
+                pow(b, 2) + 
                 pow(c, 2)
             );
         };
     };
 };
 
-// 4) Formatter: V, A, d → string
+// 4) Formatter: V, A, d => string
 auto formatResults = [](const int &V) {
     return [=](const int &A) {
         return [=](const float &d) {
@@ -51,7 +51,7 @@ auto formatResults = [](const int &V) {
     };
 };
 
-// 5) Ausgabe-Funktion (unverändert)
+// 5) remains unchanged
 void printText(const string &text) {
     cout << text;
 }
@@ -59,13 +59,11 @@ void printText(const string &text) {
 int main() {
     const int a = 2, b = 3, c = 4;
 
-    // Currying: jeden Parameter einzeln übergeben
+    // providing every parameter independently (currying)
     int V = calcVolume(a)(b)(c);
     int A = calcArea(a)(b)(c);
     float d = calcDiagonal(a)(b)(c);
 
-    // Formatieren und ausgeben
-    // string output = formatResults(V)(A)(d);
     printText(formatResults(V)(A)(d));
 
     return 0;
