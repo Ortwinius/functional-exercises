@@ -9,22 +9,22 @@ using namespace std;
 // Ikosaeder
 
 // 1) Volumen:
-auto calcVolume = [](const int &a) {
+auto calcVolume = [](const int &a) -> float {
     return 5 * pow(a, 3) * (3 + sqrt(5)) / 12;
 };
 
 // 2) Oberfläche:
-auto calcArea = [](const int &a) {
+auto calcArea = [](const int &a) -> float {
     return 5 * pow(a, 2) * sqrt(3);
 };
 
 // 3) Umkreisradius:
-auto calcRU = [](const int &a) {
+auto calcRU = [](const int &a) -> float {
     return (a / 4.0f) * sqrt(2 * (5 + sqrt(5)));
 };
 
 // 4) Inkreisradius:
-auto calcRI = [](const int &a) {
+auto calcRI = [](const int &a) -> float {
     return a * sqrt(3) * (3 + sqrt(5)) / 12;
 };
 

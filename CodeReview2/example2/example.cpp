@@ -9,29 +9,29 @@ using namespace std;
 // Cube
 
 // 1) Volumen: 
-auto calcVolume = [](const int &a) {
+auto calcVolume = [](const int &a) -> int {
     return pow(a, 3);
 };
 
 // 2) Oberfläche:
-auto calcArea = [](const int &a) {
+auto calcArea = [](const int &a) -> int {
     return 6 * pow(a, 2);
 };
 
-// 3) Raumdiagonale: 
-auto calcDiagonal = [](const int &a) {
-    return a * sqrt(3);
-};
-
 // 4) Umkreisradius: 
-auto calcRU = [](const int &a) {
+auto calcRU = [](const int &a) -> float {
     return (a / 2.0f) * sqrt(3);
 };
 
 // 5) Inkreisradius: 
-auto calcRI = [](const int &a) {
+auto calcRI = [](const int &a) -> float {
     return a / 2.0f;
 };
+
+// 3) Raumdiagonale: 
+// auto calcDiagonal = [](const int &a) -> float {
+//     return a * sqrt(3);
+// };
 
 // 6) curried because of multiple input arguments
 auto formatResults = [](const int &V) {

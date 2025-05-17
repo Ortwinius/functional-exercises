@@ -1,10 +1,9 @@
-# Mac OS files
+# Betriebssystem-Metadaten
 .DS_Store
+Thumbs.db
+Desktop.ini
 
-# Ignore all executable files without ending, like ./example
-/[a-zA-Z0-9_-]*
-
-# Ignore build outputs
+# Build-Outputs
 *.o
 *.obj
 *.exe
@@ -12,29 +11,27 @@
 *.a
 *.so
 *.dll
+build/
+bin/
 
-# Ignore backup files
+# Backup & Logs
 *~
 *.bak
 *.tmp
+*.log
+*.dmp
+*.orig
 
-# Ignore editor specific files
+# Editor/IDE
 .vscode/
 .idea/
 *.code-workspace
 
-# Ignore logs and dumps
-*.log
-*.dmp
-
-# Ignore Windows specific files
-Thumbs.db
-Desktop.ini
-
-# Ignore Git conflict files
-*.orig
-
-# Ignore generated binaries / temp builds
-build/
-bin/
-
+#–– ab hier: alles ignorieren außer Verzeichnisse & Dateien mit Punkt ––
+*
+!*/
+!*.*
+# Ausnahmen für wichtige extension-less Dateien:
+!Makefile
+!README*
+!LICENSE*

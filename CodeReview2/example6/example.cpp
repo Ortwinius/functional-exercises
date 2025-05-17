@@ -9,22 +9,22 @@ using namespace std;
 // Dodekaeder
 
 // 1) Volumen:
-auto calcVolume = [](const int &a) {
+auto calcVolume = [](const int &a) -> float {
     return pow(a, 3) * (15 + 7 * sqrt(5)) / 4.0;
 };
 
 // 2) Oberfläche:
-auto calcArea = [](const int &a) {
+auto calcArea = [](const int &a) -> float {
     return 3 * pow(a, 2) * sqrt(5 * (5 + 2 * sqrt(5)));
 };
 
 // 3) Inkreisradius:
-auto calcRI = [](const int &a) {
+auto calcRI = [](const int &a) -> float {
     return a * sqrt(10 * (25 + 11 * sqrt(5))) / 20.0;
 };
 
 // 4) Umkreisradius:
-auto calcRU = [](const int &a) {
+auto calcRU = [](const int &a) -> float {
     return a * sqrt(3) * (1 + sqrt(5)) / 4.0;
 };
 

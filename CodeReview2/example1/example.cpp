@@ -10,7 +10,7 @@ using namespace std;
 // 1) Volumen: a, b, c => V = a * b * c
 auto calcVolume = [](const int &a) {
     return [=](const int &b) {
-        return [=](const int &c) {
+        return [=](const int &c) -> int {
             return a * b * c;
         };
     };
@@ -19,7 +19,7 @@ auto calcVolume = [](const int &a) {
 // 2) Oberfläche: a, b, c => A = 2 * (a*b + a*c + b*c)©
 auto calcArea = [](const int &a) {
     return [=](const int &b) {
-        return [=](const int &c) {
+        return [=](const int &c) -> int {
             return 2 * (a * b + a * c + b * c);
         };
     };
@@ -28,7 +28,7 @@ auto calcArea = [](const int &a) {
 // 3) Raumdiagonale: a, b, c => d = sqrt(a^2 + b^2 + c^2)
 auto calcDiagonal = [](const int &a) {
     return [=](const int &b) {
-        return [=](const int &c) {
+        return [=](const int &c) -> float {
             return sqrt(
                 pow(a, 2) +
                 pow(b, 2) + 

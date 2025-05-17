@@ -14,7 +14,7 @@ auto calcVolume = [](const int &a) {
 };
 
 // 2) Oberfläche:
-auto calcArea = [](const int &a) {
+auto calcArea = [](const int &a) -> float {
     return 2 * pow(a, 2) * sqrt(3);
 };
 
