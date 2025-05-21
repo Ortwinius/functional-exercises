@@ -11,32 +11,44 @@ using Line = vector<char>;
 using Board = vector<Line>;
 using Lines = vector<Line>;     
 
+// by defining the end type as a template you can use this with any container
+// "fn" defines how the source is being transformed
+// the result is saved and returned as "DestinationType"
 template<typename DestinationType>
-auto transformAll = [](const auto& source, auto fn){
+auto transformAll = [](const auto& source, auto fn) {
     DestinationType result;
     result.reserve(source.size());
     transform(source.begin(), source.end(), back_inserter(result), fn);
     return result;
 };
 
+// basic function which creates a {0,1,2} range from any data type (also chars for example)
 auto toRange = [](const auto& collection){
     vector<int> range(collection.size());
     iota(begin(range), end(range), 0);
     return range;
 };
 
+// wrapper function to not explicitly state begin() and end()
+// uses STL to add up all values from the whole container
 auto accumulateAll = [](const auto source, auto fn){
     return accumulate(source.begin(), source.end(), typename decltype(source)::value_type(), fn);
 };
 
+// returns true if all the elems of collection 
+// fulfull the criteria stated by "fn"
+// basically ANDs all elements
 auto all_of_collection = [](const auto& collection, auto fn){
     return all_of(collection.begin(), collection.end(), fn);
 };
 
+// ORs all elements
 auto any_of_collection = [](const auto& collection, auto fn){
     return any_of(collection.begin(), collection.end(), fn);
 };
 
+// takes line vector as input
+// transforms every single number to a char and the end result is a string
 auto lineToString = [](const auto& line){
     return transformAll<string>(line, [](auto const token) -> char { return token;});
 };
@@ -52,6 +64,8 @@ auto boardToString = [](const auto& board){
             );
 };
 
+// adds second at the end of first, effectively
+// glewing them together
 auto concatenate = [](const auto& first, const auto& second){
     auto result{first};
     result.insert(result.end(), make_move_iterator(second.begin()), make_move_iterator(second.end()));
