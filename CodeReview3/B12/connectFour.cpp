@@ -47,7 +47,7 @@ const auto wrongTokens = [](auto const& board){
 };
 
 // 5) Zähle, wie oft ein Token vorkommt
-const auto countToken = [](auto const& board, char token) {
+const auto countToken = [](auto const& board, const char& token) {
     return accumulateAll(board, 0, [token](int sum, const Line& row) {
         return sum + count(row.begin(), row.end(), token);
     });
@@ -62,7 +62,7 @@ const auto diffTokensGreaterThanOne = [](auto const& board){
 
 /***************
  *   TESTS
- ***************/
+***************/
 
 TEST_CASE("The difference in the number of tokens for the two players >1") {
     Board b(6, Line(7, ' '));

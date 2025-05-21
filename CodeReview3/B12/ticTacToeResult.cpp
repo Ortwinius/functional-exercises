@@ -9,7 +9,7 @@ using namespace std::placeholders;
 
 using Line = vector<char>;
 using Board = vector<Line>;
-using Lines = vector<Line>;
+using Lines = vector<Line>;     
 
 template<typename DestinationType>
 auto transformAll = [](const auto& source, auto fn){
