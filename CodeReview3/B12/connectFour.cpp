@@ -12,6 +12,7 @@
 using namespace std;
 using namespace std::placeholders;
 
+using Token = char;
 using Line  = vector<char>;
 using Board = vector<Line>;
 
@@ -28,7 +29,22 @@ const auto diffGreaterThanOne = [](auto first, auto second) -> bool {
     return abs(first - second) > 1;
 };
 
-// 1) Board-Dimension prüfen: genau 6×7?
+static mt19937 rng(random_device{}());
+
+auto chunkTokens = [](vector<Token> const& tokens){
+    // Zeilen-Indices 0…5
+    auto rows = range(0,5);
+    // Für jede Zeile erzeugen wir eine Line von 7 Token
+    return transformAll<Board>(rows, [&](int r){
+        // Spalten-Indices 0…6
+        auto cols = range(0,6);
+        // Diese Zeile r besteht aus tokens[r*7 + c]
+        return transformAll<Line>(cols, [&](int c){
+            return tokens[r*7 + c];
+        });
+    });
+};
+
 const auto validBoardDimensions = [](auto const& board) -> bool {
     return board.size() == 6
         && all_of_collection(board, [](auto const& row){
@@ -36,11 +52,10 @@ const auto validBoardDimensions = [](auto const& board) -> bool {
            });
 };
 
-const auto singleTokenIsValid = [](const char& c) -> bool{
+const auto singleTokenIsValid = [](const char& c) -> bool {
     return c == 'X' || c == 'O' || c == ' ';
 };
 
-// 3) Nur erlaubte Tokens?
 const auto allTokensAreValid = [](auto const& board) -> bool {
     return all_of_collection(board, [](auto const& row){
         return all_of_collection(row, [](const char& c){
@@ -49,7 +64,6 @@ const auto allTokensAreValid = [](auto const& board) -> bool {
     });
 };
 
-// 5) Zähle, wie oft ein Token vorkommt
 const auto countToken = [](auto const& board, const char& token) -> int {
     return accumulateAll(board, 0, [token](int sum, const Line& row) {
         return sum + count(row.begin(), row.end(), token);

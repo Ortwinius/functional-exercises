@@ -40,14 +40,14 @@ auto flipVector = [](const vector<T>& in) -> vector<T> {
     return res;
 };
 
-TEST_CASE("charSwapInString ersetzt Zeichen funktional") {
-    string s = "banana boat";
-    auto res = replaceCharInString(s, 'a', 'x');
-    CHECK(res == "bxnxnx boxt");
-    CHECK(s == "banana boat");
+TEST_CASE("charSwapInString ersetzt Zeichen") {
+    string s = "Avada kedavra";
+    auto res = replaceCharInString(s, 'a', 'i');
+    CHECK(res == "Avidi kedivri");
+    CHECK(s == "Avada kedavra");
 }
 
-TEST_CASE("unionizeSets vereinigt zwei Sets funktional") {
+TEST_CASE("mergeSets vereinigt zwei Sets") {
     set<int> a = {10, 20, 30};
     set<int> b = {20, 40};
     auto res = mergeSets<int>(a, b);
@@ -70,7 +70,7 @@ TEST_CASE("mergeSets vereinigt zwei ComplexSets korrekt") {
     CHECK(b == ComplexSet{ {5, 6} });
 }
 
-TEST_CASE("frontInsertVector fügt Element vorne an funktional") {
+TEST_CASE("frontInsertVector fügt Element vorne an") {
     vector<string> fruits = {"apple", "banana"};
     string toInsert = "pear";
     auto result = frontInsertVector<string>(toInsert, fruits);
@@ -79,7 +79,19 @@ TEST_CASE("frontInsertVector fügt Element vorne an funktional") {
     CHECK(fruits == vector<string>({"apple", "banana"}));
 }
 
-TEST_CASE("flippedVector dreht einen Vektor um funktional") {
+TEST_CASE("frontInsertVector prepend vector to vector-of-vectors") {
+    using Vec = vector<int>;
+    vector<Vec> vv = { {1, 2}, {3, 4} };      
+    Vec vfront = {9, 8, 7};                   
+
+    auto result = frontInsertVector<Vec>(vfront, vv);
+    vector<Vec> expected = { {9, 8, 7}, {1, 2}, {3, 4} };
+
+    CHECK(result == expected);
+    CHECK(vv == vector<Vec>({ {1, 2}, {3, 4} })); 
+}
+
+TEST_CASE("flippedVector dreht einen Vektor um") {
     vector<char> c = {'x', 'y', 'z'};
     auto flipped = flipVector<char>(c);
     vector<char> expected = {'z', 'y', 'x'};
