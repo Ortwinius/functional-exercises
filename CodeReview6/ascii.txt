@@ -1,0 +1,1 @@
+This is a standard ASCII file to demonstrate word counts - 2000. 
