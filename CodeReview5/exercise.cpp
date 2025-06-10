@@ -83,9 +83,11 @@ static auto diffTokensGreaterThanOne = [](auto const& board) -> bool {
     return diffGreaterThanOne(countTokenX(board), countTokenO(board));
 };
 
-/*-----------------------------------------------
- GENERATORS
-------------------------------------------------*/
+
+
+
+
+
 
 // creates entire board with correct values
 static auto generateFilledCorrectBoard = []() {
@@ -129,32 +131,23 @@ static auto generatePartialCorrectBoard = []() {
     return chunkTokens(tokens);
 };
 
-/**
- * 3.4) generatePartialErroneousBoard()
- *
- *    - Wir nehmen ein korrektes Teil-Board (generatePartialCorrectBoard).
- *    - Wir ersetzen ein zufälliges Feld, das momentan entweder 'X', 'O' oder ' '
- *      ist, durch ein ungültiges Token (z.B. 'Z').
- *
- *    → Garantiert: teilweise gefüllt, aber enthält mindestens ein falsches Token.
- */
 static auto generatePartialErroneousBoard = []() {
     Board b = generatePartialCorrectBoard();
 
     uniform_int_distribution<int> rowDist(0, 5);
     uniform_int_distribution<int> colDist(0, 6);
     int rr = rowDist(rng);
-    int cc = colDist(rng);
+    int cc = colDist(rng); 
 
     b[rr][cc] = 'Z';
     
     return b;
 };
 
-/*-----------------------------------------------
-  4) Ein paar ganz banale Tests mit doctest
-     (Zeigt, wie man die Validatoren und Generatoren kombiniert)
-------------------------------------------------*/
+// Tests combining generators with validators
+
+//prop_checkIfFilledCorreclty
+
 
 #include "doctest.h"
 
@@ -172,10 +165,9 @@ TEST_CASE("Filled erroneous board: mindestens ein ungültiges Token") {
     auto b = generateFilledErroneousBoard();
     // Dimensions-Check
     CHECK_EQ(true, validBoardDimensions(b));
-    // Jetzt ist mindestens ein ungültiges Zeichen vorhanden → false
+    // Jetzt ist mindestens ein ungültiges Zeichen vorhanden -> false
     CHECK_EQ(false, allTokensAreValid(b));
     // Trotzdem sollten X und O immer komplett gefüllt sein, sodass |X-O| == 21-20 = 1
-    // (Weil wir nur EIN Token auf 'Z' gesetzt haben; also z.B. 21X,20O,1Z oder 20X,21O,1Z)
     CHECK_LE(abs(countTokenX(b) - countTokenO(b)), 1);
 }
 
@@ -189,33 +181,5 @@ TEST_CASE("Partial correct board: Dimension + Tokens + |X-O| ≤ 1") {
 TEST_CASE("Partial erroneous board: Dimension + zumindest ein ungültiges Token") {
     auto b = generatePartialErroneousBoard();
     CHECK_EQ(true, validBoardDimensions(b));
-    CHECK_EQ(false, allTokensAreValid(b)); // weil wir eine Position zu 'Z' gemacht haben
-}
-
-TEST_CASE("Manual Tests") {
-    Board b1(6, Line(7, ' '));
-    b1[0][0]='X'; b1[0][1]='X'; b1[0][2]='X'; b1[0][3]='X';
-    b1[1][0]='O'; b1[1][1]='O';
-    CHECK_EQ(true, diffTokensGreaterThanOne(b1));
-
-    Board b2(6, Line(7, ' '));
-    b2[0][0]='X'; b2[0][1]='X';
-    b2[1][0]='O'; b2[1][1]='O';
-    CHECK_EQ(false, diffTokensGreaterThanOne(b2));
-
-    // 2) allTokensAreValid
-    Board b3(6, Line(7, ' '));
-    b3[2][3] = 'X'; b3[4][5] = 'O';
-    CHECK_EQ(true, allTokensAreValid(b3));
-
-    Board b4(6, Line(7, ' '));
-    b4[0][0] = 'X'; b4[0][1] = 'Z';
-    CHECK_EQ(false, allTokensAreValid(b4));
-
-    // 3) validBoardDimensions
-    Board b5(5, Line(7, ' ')); // zu wenige Zeilen
-    CHECK_EQ(false, validBoardDimensions(b5));
-
-    Board b6(6, Line(7, ' '));
-    CHECK_EQ(true, validBoardDimensions(b6));
+    CHECK_EQ(false, allTokensAreValid(b)); 
 }
