@@ -4,6 +4,8 @@
 #include <functional>
 #include <algorithm>
 #include <concepts>
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -14,30 +16,30 @@ using namespace std::placeholders;
 // if yes -> invert it 
 // if no -> return nullopt
 
-// using alias for nxn matrix
+// using alias for nxn matrix  
 using Matrix = vector<vector<double>>;
 
-struct Result {
+struct MatrixResult {
     optional<Matrix> value;
     optional<string> error;
 
-    Result bind(const auto& transform) const {
+    MatrixResult bind(const auto& transform) const {
         if (!value.has_value())
             return *this;
         return transform(*value);
     }
 
-    static Result success(const Matrix& m) {
-        return Result{ make_optional(m), nullopt };
+    static MatrixResult success(const Matrix& m) {
+        return MatrixResult{ make_optional(m), nullopt };
     }
 
-    static Result failure(const string& msg) {
-        return Result{ nullopt, make_optional(msg) };
+    static MatrixResult failure(const string& msg) {
+        return MatrixResult{ nullopt, make_optional(msg) };
     }
 };
 
-Result unit(const Matrix& m) {
-    return Result::success(m);
+MatrixResult unit(const Matrix& m) {
+    return MatrixResult::success(m);
 }
 
 // checks if rows == 2 AND cols == 2 => which means its a 2x2 matrix
@@ -47,7 +49,7 @@ auto has_wrong_dimensions = [](const Matrix& m) {
 
 auto invert_matrix = [](const Matrix& m) {
     if (has_wrong_dimensions(m)) {
-        return Result::failure("Only 2x2 matrices are allowed");
+        return MatrixResult::failure("Only 2x2 matrices are allowed");
     }
 
     double a = m[0][0], b = m[0][1];
@@ -57,7 +59,7 @@ auto invert_matrix = [](const Matrix& m) {
 
     // for floating point instead of checking == 0 using 1*10^-10 = 0,0000000001 instead
     if(abs(det) < 1e-10){
-        return Result::failure("Matrix is not invertible (det = 0).");
+        return MatrixResult::failure("Matrix is not invertible (det = 0).");
     }
 
     double div = 1.0 / det;
@@ -67,52 +69,109 @@ auto invert_matrix = [](const Matrix& m) {
         { -c * div, a * div }
     };
 
-    return Result::success(inv);
+    return MatrixResult::success(inv);
 };
 
-auto print_matrix = [](const Matrix& m) {
+auto print_result = [](const Matrix& m) -> MatrixResult {
     for (const auto& row : m) {
-        for (const auto& val : row) {
+        for (double val : row) {
             cout << val << " ";
         }
         cout << "\n";
     }
     cout << "\n";
+
+    return unit(m); // oder einfach return {m}; aber unit(m) ist schöner
 };
 
-int main() {
+TEST_CASE("Matrix has invalid dimensions") {
+    Matrix badMatrix = {
+        {1, 2, 3},
+        {4, 5, 6}
+    };
 
-    // Test 1: Should return inverted matrix
-    Matrix invertibleMatrix{
+    auto result = unit(badMatrix)
+                    .bind(invert_matrix)
+                    .bind(print_result);
+
+    CHECK(result.value.has_value() == false);
+    CHECK(result.error.has_value());
+    CHECK_EQ(result.error.value(), "Only 2x2 matrices are allowed");
+}
+
+TEST_CASE("Matrix is 2x2 but not invertible (det = 0)") {
+    Matrix singularMatrix = {
+        {2, 4},
+        {1, 2}
+    };
+
+    auto result = unit(singularMatrix)
+                    .bind(invert_matrix)
+                    .bind(print_result);
+    
+    CHECK_FALSE(result.value.has_value());
+    CHECK(result.error.has_value());
+    CHECK_EQ(result.error.value(), "Matrix is not invertible (det = 0).");
+}
+
+TEST_CASE("Matrix is invertible and bind works correctly") {
+    Matrix invertibleMatrix = {
         {1, 2},
         {3, 4}
     };
 
-    auto resultInvertible = unit(invertibleMatrix)
-        .bind(invert_matrix);
+    auto result = unit(invertibleMatrix)
+                    .bind(invert_matrix)
+                    .bind(print_result);
 
-    if (resultInvertible.error.has_value()) {
-        cout << resultInvertible.error.value() << endl;
-    } else {
-        cout << "Inverted Matrix:\n";
-        print_matrix(resultInvertible.value.value());
-    }
+    REQUIRE(result.value.has_value());
+    const Matrix& inv = result.value.value();
 
-    // Test 2 : Should return error
-    // Matrix notInvertibleMatrix{
-    //     {2, 4},
-    //     {1, 2}
-    // };
-
-    // auto resultNotInvertible = unit(notInvertibleMatrix)
-    //     .bind(invert_matrix);
-
-    // if (resultNotInvertible.error.has_value()) {
-    //     cout << resultNotInvertible.error.value() << endl;
-    // } else {
-    //     cout << "Inverted Matrix:\n";
-    //     print_matrix(resultNotInvertible.value.value());
-    // }
-
-    return 0;
+    // expected inverse:
+    // [ -2.0  1.0 ]
+    // [ 1.5  -0.5 ]
+    CHECK_EQ(inv[0][0], doctest::Approx(-2.0));
+    CHECK_EQ(inv[0][1], doctest::Approx(1.0));
+    CHECK_EQ(inv[1][0], doctest::Approx(1.5));
+    CHECK_EQ(inv[1][1], doctest::Approx(-0.5));
 }
+
+
+
+
+// int main() {
+
+//     // Test 1: Should return inverted matrix
+//     Matrix invertibleMatrix{
+//         {1, 2},
+//         {3, 4}
+//     };
+
+//     auto resultInvertible = unit(invertibleMatrix)
+//         .bind(invert_matrix);
+
+//     if (resultInvertible.error.has_value()) {
+//         cout << resultInvertible.error.value() << endl;
+//     } else {
+//         cout << "Inverted Matrix:\n";
+//         print_matrix(resultInvertible.value.value());
+//     }
+
+//     // Test 2 : Should return error
+//     // Matrix notInvertibleMatrix{
+//     //     {2, 4},
+//     //     {1, 2}
+//     // };
+
+//     // auto resultNotInvertible = unit(notInvertibleMatrix)
+//     //     .bind(invert_matrix);
+
+//     // if (resultNotInvertible.error.has_value()) {
+//     //     cout << resultNotInvertible.error.value() << endl;
+//     // } else {
+//     //     cout << "Inverted Matrix:\n";
+//     //     print_matrix(resultNotInvertible.value.value());
+//     // }
+
+//     return 0;
+// }

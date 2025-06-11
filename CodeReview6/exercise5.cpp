@@ -5,6 +5,8 @@
 #include <functional>
 #include <iterator>
 #include <numeric>
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest.h"
 
 using namespace std;
 using namespace std::placeholders;
@@ -52,31 +54,46 @@ auto isFileEBCDIC = [](const string& content) -> MaybeStr {
     return { nullopt };
 };
 
+
+auto displayToStream = [](ostream& out) {
+    return [&out](const string& s) -> MaybeStr {
+        out << s;
+        return unit(s);  // return s so that monadic chain can continue :D
+    };
+};
+
+auto displayToConsole = displayToStream(cout);
+
 // uses built-in and_then function 
 // -> takes optional<T> type and performs 
 // operation (isFileEBCDIC) on it if its not nullopt
 auto processFileContent = [](const string& filename) -> MaybeStr {
     return readFile(filename)
-        .and_then(isFileEBCDIC);
+        .and_then(isFileEBCDIC)
+        .and_then(displayToConsole);
 };
 
-// can be used with any output
-auto displayToSource = [](const string& data, ostream& stream){
-    stream << data;
-};
-
-auto displayToConsole = std::bind(displayToSource, _1, std::ref(cout));
-
-int main() {
-    const string filename = "ebcdic.ebc";
-    // const string filename = "ascii.txt";
-    MaybeStr result = processFileContent(filename);
-
-    if (result.has_value()) {
-        cout << "\nDatei ist im EBCDIC-Format.\n\n";
-        displayToConsole(*result);
-    } else {
-        cout << "\nDatei ist nicht EBCDIC oder konnte nicht gelesen werden.\n";
-    }
-    return 0;
+TEST_CASE("File does not exist returns nullopt") {
+    auto result = processFileContent("missing_file.txt");
+    CHECK_FALSE(result.has_value());
 }
+
+TEST_CASE("ASCII file opens and is rejected as EBCDIC") {
+    auto result = processFileContent("ascii.txt");
+    CHECK_FALSE(result.has_value());
+}
+
+TEST_CASE("EBCDIC file opens and is accepted as EBCDIC") {
+    auto result = processFileContent("ebcdic.ebc");
+    CHECK(result.has_value());
+    CHECK(result->size() > 0); // content was returned
+}
+
+
+// int main() {
+//     const string filename = "ebcdic.ebc";
+//     // const string filename = "ascii.txt";
+//     MaybeStr result = processFileContent(filename);
+
+//     return 0;
+// }
