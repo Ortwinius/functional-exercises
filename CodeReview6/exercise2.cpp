@@ -81,7 +81,7 @@ auto print_result = [](const Matrix& m) -> MatrixResult {
     }
     cout << "\n";
 
-    return unit(m); // oder einfach return {m}; aber unit(m) ist schöner
+    return unit(m); 
 };
 
 TEST_CASE("Matrix has invalid dimensions") {

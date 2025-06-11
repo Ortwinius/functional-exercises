@@ -3,6 +3,8 @@
 #include <cmath>
 #include <optional>
 #include <functional>
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest.h"
 
 using namespace std;
 
@@ -10,7 +12,6 @@ using namespace std;
 Quartic equation exercise -> solves biquadratic special case, returns nullopt if solution is complex, a = 0 or anyhting else
 if not biquadratic -> fail bc general quartic equation scares me to death
 */ 
-
 
 // holds all solutions of quartic equation (=4)
 struct QuarticSolution {
@@ -37,32 +38,28 @@ auto solve_quartic = [](const double a, const double b, const double c, const do
     return nullopt;
 };
 
-auto print_solution = [](const QuarticSolution& sol) {
+auto print_solution = [](const QuarticSolution& sol) -> optional<QuarticSolution> {
     cout << "Lösungen:\n";
     for (double x : sol.roots) {
         cout << x << "\n";
     }
+    return sol;
 };
 
-int main() {
-    // x^4 - 16 = 0 -> should return 4 solutions: x = 2,2,-2,-2 
-    const auto result = solve_quartic(1, 0, 0, 0, -16);  
+TEST_CASE("Biquadratic equation with 4 real roots") {
+    auto result = solve_quartic(1, 0, 0, 0, -16).and_then(print_solution);
+    REQUIRE(result.has_value());
+    const auto& roots = result->roots;
+    CHECK(roots.size() == 4);
+    CHECK_EQ(abs(roots[0]), 2);
+}
 
-    if (result.has_value()) {
-        print_solution(*result);
-    } else {
-        cout << "Keine reelle Lösung oder kein gültiger quartischer Term.\n";
-    }
+TEST_CASE("Biquadratic with complex roots returns nullopt") {
+    auto result = solve_quartic(1, 0, 0, 0, 16);
+    CHECK_FALSE(result.has_value());
+}
 
-    // x^4 + 16 = 0 -> x^4 = -16 -> x = 4th sqrt of (-16) => complex! should return nullopt! 
-    // const auto result = solve_quartic(1, 0, 0, 0, 16);  
-
-    // if (result.has_value()) {
-    //     print_solution(*result);
-    // } else {
-    //     cout << "Keine reelle Lösung oder kein gültiger quartischer Term.\n";
-    // }
-
-
-    return 0;
+TEST_CASE("Non-quartic equation returns nullopt") {
+    auto result = solve_quartic(0, 0, 0, 0, -16);
+    CHECK_FALSE(result.has_value());
 }

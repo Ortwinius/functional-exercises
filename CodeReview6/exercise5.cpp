@@ -54,7 +54,7 @@ auto isFileEBCDIC = [](const string& content) -> MaybeStr {
     return { nullopt };
 };
 
-
+// using currying so that the output stream can be anything but its also chainable with the monad
 auto displayToStream = [](ostream& out) {
     return [&out](const string& s) -> MaybeStr {
         out << s;

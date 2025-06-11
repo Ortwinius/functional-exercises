@@ -1,4 +1,4 @@
-all: exercise4
+all: exercise3
 
 .outputFolder:
 	mkdir -p out
