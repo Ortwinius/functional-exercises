@@ -5,6 +5,7 @@
 #include <string>
 #include <functional>
 #include <cctype>  
+#include <algorithm>
 
 using namespace std;
 
@@ -19,11 +20,11 @@ struct CharMaybe {
 };
 
 // returns CharMaybe building block of std::optional type
-const CharMaybe unit(const vector<char>& letters) {
+CharMaybe unit(const vector<char>& letters) {
     return CharMaybe{ make_optional(letters) };
 }
 
-const auto readAllValuesFromFile = [](const string& filename) -> CharMaybe {
+auto readAllValuesFromFile = [](const string& filename) -> CharMaybe {
     ifstream in(filename);
     if (!in) { // if file cannot be opened
         return { nullopt };
@@ -31,21 +32,23 @@ const auto readAllValuesFromFile = [](const string& filename) -> CharMaybe {
     
     vector<char> allChars;
     char c;
+
     while (in.get(c)) {
         allChars.push_back(c);
     }
     return unit(allChars);
 };
 
-const CharMaybe filterLettersFromFile(const vector<char>& chars) {
+auto filterLettersFromFile = [](const vector<char>& chars) -> CharMaybe {
     vector<char> letters;
-    for (const char& c : chars) {
-        if (isalpha(c)) {
-            letters.push_back(c);
-        }
-    }
+    letters.reserve(chars.size()); // reserves memory but doesnt change the size of the vector
+
+    copy_if(chars.begin(), chars.end(), back_inserter(letters), [](char c){
+        return isalpha(static_cast<unsigned char>(c)); 
+    });
+
     return unit(letters);
-}
+};
 
 const auto countLetters = [](const vector<char>& letters) -> size_t {
     return letters.size();

@@ -1,6 +1,3 @@
-// file: example1_letters.cpp
-// compile with: g++ -std=c++23 -Wall example1_letters.cpp
-
 #include <iostream>
 #include <optional>
 #include <vector>
@@ -19,11 +16,12 @@ using namespace std::placeholders;
 
 // using alias for nxn matrix
 using Matrix = vector<vector<double>>;
+
 struct Result {
     optional<Matrix> value;
     optional<string> error;
 
-    Result bind(const function<Result(const Matrix&)>& transform) const {
+    Result bind(const auto& transform) const {
         if (!value.has_value())
             return *this;
         return transform(*value);
@@ -42,26 +40,26 @@ Result unit(const Matrix& m) {
     return Result::success(m);
 }
 
-// simple determinant function which calculates 2x2 determinant
-// formula: a*d - b*c
-auto get_determinant = [](const Matrix& m) {
-    return m[0][0] * m[1][1] - m[0][1] * m[1][0];
+// checks if rows == 2 AND cols == 2 => which means its a 2x2 matrix
+auto has_wrong_dimensions = [](const Matrix& m) {
+    return m.size() != 2 || m[0].size() != 2;
 };
 
 auto invert_matrix = [](const Matrix& m) {
-    if (m.size() != 2 || m[0].size() != 2 || m[1].size() != 2) {
+    if (has_wrong_dimensions(m)) {
         return Result::failure("Only 2x2 matrices are allowed");
-    }
-
-    // for floating point instead of checking == 0 using 1*10^-10 = 0,0000000001 instead
-    if(abs(get_determinant(m)) < 1e-10){
-        return Result::failure("Matrix is not invertible (det = 0).");
     }
 
     double a = m[0][0], b = m[0][1];
     double c = m[1][0], d = m[1][1];
 
     double det = a * d - b * c;
+
+    // for floating point instead of checking == 0 using 1*10^-10 = 0,0000000001 instead
+    if(abs(det) < 1e-10){
+        return Result::failure("Matrix is not invertible (det = 0).");
+    }
+
     double div = 1.0 / det;
 
     Matrix inv = {
