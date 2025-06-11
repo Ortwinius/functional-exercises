@@ -9,22 +9,26 @@
 using namespace std;
 using namespace std::placeholders;
 
-struct MaybeStr {
-    optional<string> value;
-    MaybeStr bind(const function<MaybeStr(const string&)>& transform) const {
-        if (!value.has_value()) return { nullopt };
-        return transform(*value);
-    }
-};
+// declaring Maybe alias
+using MaybeStr = std::optional<std::string>;
 
+// declaring unit function which takes string as input and returns optional<string>(input)
 MaybeStr unit(const string& s) {
     return MaybeStr{ make_optional(s) };
 }
 
 auto readFile = [](const string& path) -> MaybeStr {
+    // opens file with name "path"
+    // ios::binary makes sure data is read without translating \n or \r etc.
     ifstream in(path, ios::binary);
+
+    // return nullopt if it cannot be opened / found
     if (!in) return { nullopt };
+
+    // parse content into input streambuf
     string content((istreambuf_iterator<char>(in)), istreambuf_iterator<char>());
+
+    // packs string into MaybeStr format
     return unit(content);
 };
 
@@ -48,9 +52,12 @@ auto isFileEBCDIC = [](const string& content) -> MaybeStr {
     return { nullopt };
 };
 
+// uses built-in and_then function 
+// -> takes optional<T> type and performs 
+// operation (isFileEBCDIC) on it if its not nullopt
 auto processFileContent = [](const string& filename) -> MaybeStr {
     return readFile(filename)
-        .bind(isFileEBCDIC);
+        .and_then(isFileEBCDIC);
 };
 
 // can be used with any output
@@ -65,9 +72,9 @@ int main() {
     // const string filename = "ascii.txt";
     MaybeStr result = processFileContent(filename);
 
-    if (result.value.has_value()) {
+    if (result.has_value()) {
         cout << "\nDatei ist im EBCDIC-Format.\n\n";
-        displayToConsole(*result.value);
+        displayToConsole(*result);
     } else {
         cout << "\nDatei ist nicht EBCDIC oder konnte nicht gelesen werden.\n";
     }
