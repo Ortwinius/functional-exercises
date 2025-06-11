@@ -42,20 +42,22 @@ Result unit(const Matrix& m) {
     return Result::success(m);
 }
 
-auto is_invertable = [](const Matrix& m) {
+// simple determinant function which calculates 2x2 determinant
+// formula: a*d - b*c
+auto get_determinant = [](const Matrix& m) {
+    return m[0][0] * m[1][1] - m[0][1] * m[1][0];
+};
+
+auto invert_matrix = [](const Matrix& m) {
     if (m.size() != 2 || m[0].size() != 2 || m[1].size() != 2) {
         return Result::failure("Only 2x2 matrices are allowed");
     }
 
-    double det = m[0][0] * m[1][1] - m[0][1] * m[1][0];
-    if (det == 0) {
+    // for floating point instead of checking == 0 using 1*10^-10 = 0,0000000001 instead
+    if(abs(get_determinant(m)) < 1e-10){
         return Result::failure("Matrix is not invertible (det = 0).");
     }
 
-    return Result::success(m);
-};
-
-auto invert_matrix = [](const Matrix& m) {
     double a = m[0][0], b = m[0][1];
     double c = m[1][0], d = m[1][1];
 
@@ -77,31 +79,42 @@ auto print_matrix = [](const Matrix& m) {
         }
         cout << "\n";
     }
+    cout << "\n";
 };
 
 int main() {
-    // invertible:
-    Matrix initMatrix{
+
+    // Test 1: Should return inverted matrix
+    Matrix invertibleMatrix{
         {1, 2},
         {3, 4}
     };
 
-    // not invertible:
-    // Matrix initMatrix{
+    auto resultInvertible = unit(invertibleMatrix)
+        .bind(invert_matrix);
+
+    if (resultInvertible.error.has_value()) {
+        cout << resultInvertible.error.value() << endl;
+    } else {
+        cout << "Inverted Matrix:\n";
+        print_matrix(resultInvertible.value.value());
+    }
+
+    // Test 2 : Should return error
+    // Matrix notInvertibleMatrix{
     //     {2, 4},
     //     {1, 2}
     // };
 
-    auto result = unit(initMatrix)
-        .bind(is_invertable)
-        .bind(invert_matrix);
+    // auto resultNotInvertible = unit(notInvertibleMatrix)
+    //     .bind(invert_matrix);
 
-    if (result.error.has_value()) {
-        cout << result.error.value() << endl;
-    } else {
-        cout << "Inverted Matrix:\n";
-        print_matrix(result.value.value());
-    }
+    // if (resultNotInvertible.error.has_value()) {
+    //     cout << resultNotInvertible.error.value() << endl;
+    // } else {
+    //     cout << "Inverted Matrix:\n";
+    //     print_matrix(resultNotInvertible.value.value());
+    // }
 
     return 0;
 }
