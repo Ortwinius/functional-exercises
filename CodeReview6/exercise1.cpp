@@ -8,19 +8,27 @@
 
 using namespace std;
 
-// returns Maybe building block of std::optional type
-using MaybeChars = optional<vector<char>>;
+struct CharMaybe {
+    optional<vector<char>> value;
 
-const MaybeChars unit(const vector<char>& letters) {
-    return make_optional(letters);
+    CharMaybe bind(const function<CharMaybe(const vector<char>&)>& transform) const {
+        if (!value.has_value())
+            return { nullopt };               
+        return transform(*value); // *value = value.value()           
+    }
+};
+
+// returns CharMaybe building block of std::optional type
+const CharMaybe unit(const vector<char>& letters) {
+    return CharMaybe{ make_optional(letters) };
 }
 
-const auto readAllValuesFromFile = [](const string& filename) -> MaybeChars {
+const auto readAllValuesFromFile = [](const string& filename) -> CharMaybe {
     ifstream in(filename);
     if (!in) { // if file cannot be opened
-        return nullopt;
+        return { nullopt };
     }
-
+    
     vector<char> allChars;
     char c;
     while (in.get(c)) {
@@ -29,15 +37,15 @@ const auto readAllValuesFromFile = [](const string& filename) -> MaybeChars {
     return unit(allChars);
 };
 
-const auto filterLettersFromFile = [](const vector<char>& chars) -> MaybeChars {
+const CharMaybe filterLettersFromFile(const vector<char>& chars) {
     vector<char> letters;
     for (const char& c : chars) {
-        if (isalpha(static_cast<unsigned char>(c))) {
+        if (isalpha(c)) {
             letters.push_back(c);
         }
     }
     return unit(letters);
-};
+}
 
 const auto countLetters = [](const vector<char>& letters) -> size_t {
     return letters.size();
@@ -46,15 +54,15 @@ const auto countLetters = [](const vector<char>& letters) -> size_t {
 int main() {
     const auto filteredLetters =
         readAllValuesFromFile("ascii.txt")
-            .and_then(filterLettersFromFile);
+            .bind(filterLettersFromFile);
 
     // check if result is nullopt
-    if (!filteredLetters.has_value()) {
+    if (!filteredLetters.value.has_value()) {
         cout << "Error: konnte Datei nicht lesen oder verarbeiten.\n";
         return 0;
     }
 
-    const size_t letterCount = countLetters(*filteredLetters);
+    const size_t letterCount = countLetters(*filteredLetters.value);
 
     cout << "Anzahl Buchstaben: " << letterCount << "\n";
     return 0;
