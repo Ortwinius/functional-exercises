@@ -1,66 +1,51 @@
 #include <iostream>
 #include <fstream>
-#include <optional>
+#include <sstream>
 #include <string>
-#include <functional>
-#include <algorithm>
+#include <vector>
 #include <ranges>
-#include <iterator>
 #include <numeric>
+#include <optional>
+#include <functional>
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest.h"
 
 using namespace std;
-using namespace std::placeholders;
+namespace views = std::views;
 
 struct WeatherRecord {
-    const string date;
-    const string city;
-    const double temperature;
-    const double humidity;
-    const double windSpeed;
+    string date;
+    string city;
+    double temperatureC;
+    double humidity;
+    double windSpeed;
 };
 
-using Weathers = optional<vector<WeatherRecord>>;
+//TODO: extract ifstream as interface
+// Einfache CSV-Parserfunktion
+vector<WeatherRecord> readCsv(const string& path) {
+    ifstream in(path);
+    vector<WeatherRecord> data;
+    string line;
+    getline(in, line); // Header ignorieren
 
-Weathers unit(const vector<WeatherRecord>& ws) {
-    return make_optional(ws);
+    while (getline(in, line)) {
+        istringstream iss(line);
+        string date, city, tempStr, humStr, windStr;
+
+        getline(iss, date, ',');
+        getline(iss, city, ',');
+        getline(iss, tempStr, ',');
+        getline(iss, humStr, ',');
+        getline(iss, windStr, ',');
+
+        data.push_back(WeatherRecord{
+            date,
+            city,
+            stod(tempStr),
+            stod(humStr),
+            stod(windStr)
+        });
+    }
+    return data;
 }
-
-auto temperatureAbove20DegreesC = [](const WeatherRecord& w){
-    return w.temperature > 20;
-};
-
-// auto readFromCsvFile = [](const string& path) -> Weathers{
-//     ifstream in(path, ios::binary);
-
-//     // return nullopt if it cannot be opened / found
-//     if (!in) return { nullopt };
-
-//     // parse content into input streambuf
-//     string content((istreambuf_iterator<char>(in)), istreambuf_iterator<char>());
-
-//     //TODO: parse words into WeatherRecords 
-
-//     // return unit(allRecords);
-//     return { nullopt };
-// };
-
-auto filterByFormula = [](const Weathers& ws, const auto& formula){
-    auto filtered = ws | ranges::views::filter(formula);
-    return filtered;
-};
-
-TEST_CASE(""){
-    // one point
-    vector<WeatherRecord> records = {
-        {"2020-05-20", "Vienna", 20, 3, 200},
-        {"2021-05-20", "Luxembourgh", 21, 3, 200}
-    };
-    // auto res = records | ranges::views::filter(temperatureAbove20DegreesC);
-    auto res = unit(records).and_then(filterByFormula(records,temperatureAbove20DegreesC));
-    CHECK(!res.empty());
-
-}
-
-
